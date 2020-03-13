@@ -8,8 +8,8 @@ import (
 	"os"
 	"syscall/js"
 
-	"github.com/joiningdata/lollipops/data"
-	"github.com/joiningdata/lollipops/drawing"
+	"github.com/NagaComBio/lollipops/data"
+	"github.com/NagaComBio/lollipops/drawing"
 )
 
 func createOutput(elementID string, d *data.GraphicResponse, variants []string) error {

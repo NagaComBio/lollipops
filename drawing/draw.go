@@ -19,11 +19,12 @@ package drawing
 
 import (
 	"fmt"
+	"math"
 	"sort"
 	"strings"
 	"unicode"
 
-	"github.com/joiningdata/lollipops/data"
+	"github.com/NagaComBio/lollipops/data"
 )
 
 type diagram struct {
@@ -62,19 +63,28 @@ func (s *Settings) prepare(changelist []string, g *data.GraphicResponse) *diagra
 	pops := TickSlice{}
 	col := s.SynonymousColor
 	s.GraphicHeight = s.DomainHeight + s.Padding*2
+	heightMatch := make(map[int]int)
+	maxHeight := s.LollipopRadius + s.LollipopHeight
+
 	if len(changelist) > 0 {
-		popMatch := make(map[string]int)
+		popMatch := make(map[int]int)
 		// parse changelist and check if lollipops need staggered
 		for i, chg := range changelist {
 			if chg == "" {
 				continue
 			}
+			var shape int
 			cnt := 1
 			cpos := stripChangePos.FindStringSubmatch(chg)
 			spos := 0
 			col = s.SynonymousColor
 			if len(cpos) == 4 && (cpos[3] != "" && cpos[3] != "=" && cpos[3] != cpos[1]) {
 				col = s.MutationColor
+			}
+			if strings.Contains(chg, ":") {
+				parts := strings.SplitN(chg, ":", 2)
+				fmt.Sscanf(parts[1], "%d", &shape)
+				chg = parts[0]
 			}
 			if strings.Contains(chg, "@") {
 				parts := strings.SplitN(chg, "@", 2)
@@ -89,22 +99,29 @@ func (s *Settings) prepare(changelist []string, g *data.GraphicResponse) *diagra
 			changelist[i] = chg
 			fmt.Sscanf(cpos[2], "%d", &spos)
 			col = strings.ToLower(col)
-			if idx, f := popMatch[chg+col]; f {
-				pops[idx].Cnt += cnt
+			if idx, f := popMatch[spos]; f {
+				//	pops[idx].Cnt += cnt
+				popMatch[spos] = len(pops)
+				heightMatch[spos]++
+				h := pops[idx].H + (s.LollipopHeight + s.LollipopRadius)
+				maxHeight = math.Max(maxHeight, h)
+				pops = append(pops, Tick{Pos: spos, Pri: -i, Cnt: cnt, Col: col, Shape: shape, H: h})
 			} else {
-				popMatch[chg+col] = len(pops)
-				pops = append(pops, Tick{Pos: spos, Pri: -i, Cnt: cnt, Col: col})
+				popMatch[spos] = len(pops)
+				heightMatch[spos] = 1
+				h := s.LollipopRadius + s.LollipopHeight
+				pops = append(pops, Tick{Pos: spos, Pri: -i, Cnt: cnt, Col: col, Shape: shape, H: h})
 			}
 		}
 		sort.Sort(pops)
 		maxStaggered := s.LollipopRadius + s.LollipopHeight
 		for pi, pop := range pops {
-			h := s.LollipopRadius + s.LollipopHeight
+			h := pop.H
 			for pj := pi + 1; pj < len(pops); pj++ {
 				if pops[pj].Pos-pop.Pos > popSpace {
 					break
 				}
-				h += 0.5 + (pop.Radius(s) * 3.0)
+				h += 0.5 + (pop.Radius(s) * 1.5)
 			}
 			if h > maxStaggered {
 				maxStaggered = h
@@ -135,23 +152,28 @@ func (s *Settings) prepare(changelist []string, g *data.GraphicResponse) *diagra
 		// position lollipops
 		for pi, pop := range pops {
 			spos := s.Padding + (float64(pop.Pos) * scale)
-			mytop := poptop
+			//mytop := poptop
+			if heightMatch[pop.Pos] == 1 {
+				pop.H = maxHeight
+			}
 			for pj := pi + 1; pj < len(pops); pj++ {
 				if pops[pj].Pos-pop.Pos > popSpace {
 					break
 				}
-				mytop -= 0.5 + (pops[pj].Radius(s) * 3.0)
+				//mytop -= 0.5 + (pops[pj].Radius(s) * 3.0)
+				pop.H -= 0.5 + (pops[pj].Radius(s) * 1.5)
 			}
 
 			d.ticks = append(d.ticks, Tick{
-				Pos: pop.Pos,
-				Pri: 10,
-				Col: pop.Col,
+				Pos:   pop.Pos,
+				Pri:   10,
+				Col:   pop.Col,
+				Shape: pop.Shape,
 
 				isLollipop: true,
 				label:      changelist[-pop.Pri],
 				x:          spos,
-				y:          mytop,
+				y:          pop.H,
 				r:          pop.Radius(s),
 			})
 		}

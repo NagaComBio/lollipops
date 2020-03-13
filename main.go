@@ -27,9 +27,9 @@ import (
 	"path"
 	"strings"
 
+	"github.com/NagaComBio/lollipops/data"
+	"github.com/NagaComBio/lollipops/drawing"
 	"github.com/inconshreveable/mousetrap"
-	"github.com/joiningdata/lollipops/data"
-	"github.com/joiningdata/lollipops/drawing"
 )
 
 var (
@@ -87,10 +87,11 @@ Protein changes:
   provided. The COUNT tag can be used to scale the lollipop marker size so that
   the area is exponentially proportional to the count indicated. Examples:
 
-    R273C            -- non-synonymous mutation at codon 273
-    T125@5           -- synonymous mutation at codon 125 with "5x" marker sizing
-    R248Q#00ff00     -- green lollipop at codon 248
-    R248Q#00ff00@131 -- green lollipop at codon 248 with "131x" marker sizing
+    R273C              -- non-synonymous mutation at codon 273
+    T125@5             -- synonymous mutation at codon 125 with "5x" marker sizing
+    R248Q#00ff00       -- green lollipop at codon 248
+	R248Q#00ff00@131   -- green lollipop at codon 248 with "131x" marker sizing
+	R248Q#00ff00@131:2 -- green "square" lollipop at codon 248 with "131x" marker sizing
 
   (N.B. color must come before count in tags)
 

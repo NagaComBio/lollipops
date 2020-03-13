@@ -11,6 +11,11 @@ of Gene Symbols and lookup domain/motif features for display. If
 variant changes are provided, it will also annotate them to the diagram
 using the "lollipops" markers that give the tool it's name.
 
+Main update from @NagaComBio:
+1. The square shape is now available via ":2".
+2. If the variants are the same, they are not stacked-up on each other.
+3. If the variants are close enough, they are still shifted, but only a little so the difference between "close enough" and "stacking up" are clear.
+
 ## Example
 
 Basic usage is just the gene symbol (ex: ``TP53``) and a list of
@@ -27,6 +32,10 @@ labels, a legend for abbreviated domains, and more:
 		./lollipops -legend -labels TP53 R248Q#7f3333@131 R273C R175H T125@5
 
 ![TP53 Lollipop diagram with 5 customized mutations](tp53_more.png?raw=true)
+
+		./lollipops -legend -labels -o tp53_more_shape.png TP53 R248Q#7f3333@131 R273C R175H T125@5:2 R175X:2 X177X@10:2
+
+![TP53 Lollipop diagram with customized shapes and sizes](tp53_more_shape.png?raw=true)
 
 ## Usage
 
@@ -50,12 +59,14 @@ mutation color is used. The COLOR tag will override using the #RRGGBB style
 provided. The COUNT tag can be used to scale the lollipop marker size so that
 the area is exponentially proportional to the count indicated. Examples:
 
-    R273C            -- non-synonymous mutation at codon 273
-    T125@5           -- synonymous mutation at codon 125 with "5x" marker sizing
-    R248Q#00ff00     -- green lollipop at codon 248
-    R248Q#00ff00@131 -- green lollipop at codon 248 with "131x" marker sizing
+    R273C              -- non-synonymous mutation at codon 273
+    T125@5             -- synonymous mutation at codon 125 with "5x" marker sizing
+    R248Q#00ff00       -- green lollipop at codon 248
+    R248Q#00ff00@131   -- green lollipop at codon 248 with "131x" marker sizing
+    R248Q#00ff00@131:2 -- green "square" lollipop at codon 248 with "131x" marker sizing
 
 **N.B.** Color must come before count in tags.
+**N.B.** Shape must come last, and only ":2" for square and leave it empyty for circle, will add more shapes later 
 
 #### Diagram generation options
 

@@ -7,8 +7,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/joiningdata/lollipops/data"
-	"github.com/joiningdata/lollipops/drawing"
+	"github.com/NagaComBio/lollipops/data"
+	"github.com/NagaComBio/lollipops/drawing"
 )
 
 func createOutput(filename string, d *data.GraphicResponse, variants []string) error {

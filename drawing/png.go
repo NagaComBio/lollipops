@@ -26,8 +26,8 @@ import (
 	"io"
 	"log"
 
+	"github.com/NagaComBio/lollipops/data"
 	"github.com/golang/freetype/truetype"
-	"github.com/joiningdata/lollipops/data"
 	"golang.org/x/image/font"
 	"golang.org/x/image/math/fixed"
 )
@@ -96,7 +96,16 @@ func (s *diagram) png(w io.Writer) {
 
 		c := color.RGBA{0xBA, 0xBD, 0xB6, 0xFF}
 		thickvline(img, int(pop.x-s.dpi/144), int(pop.y), int(popbot), 2*s.dpi/72.0, c)
-		drawCircle(img, int(pop.x+s.dpi/144), int(pop.y), int(pop.r), colorFromHex(pop.Col))
+		if pop.Shape == 2 {
+			adjustWH := pop.r + (pop.r / 2)
+			adjustX := pop.x - (adjustWH / 2)
+			adjustY := pop.y - (adjustWH / 2)
+
+			drawRectWH(img, adjustX+s.dpi/144, adjustY, adjustWH, adjustWH, colorFromHex(pop.Col))
+
+		} else {
+			drawCircle(img, int(pop.x+s.dpi/144), int(pop.y), int(pop.r), colorFromHex(pop.Col))
+		}
 
 		if s.ShowLabels {
 			chg := pop.label

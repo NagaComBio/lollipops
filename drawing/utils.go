@@ -23,22 +23,24 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/joiningdata/lollipops/data"
+	"github.com/NagaComBio/lollipops/data"
 )
 
 var stripChangePos = regexp.MustCompile("(^|[A-Za-z]*)([0-9]+)([A-Za-z]*)")
 
 type Tick struct {
-	Pos int
-	Pri int
-	Cnt int
-	Col string
+	Pos   int
+	Pri   int
+	Cnt   int
+	Col   string
+	Shape int
 
 	isLollipop bool
 	label      string
 	x          float64
 	y          float64
 	r          float64
+	H          float64
 }
 
 type TickSlice []Tick

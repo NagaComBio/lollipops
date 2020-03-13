@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/joiningdata/lollipops/data"
+	"github.com/NagaComBio/lollipops/data"
 )
 
 const svgHeader = `<?xml version='1.0'?>
@@ -70,6 +70,8 @@ func (s *diagram) svg(w io.Writer) {
 	poptop := startY + s.LollipopRadius
 	popbot := poptop + s.LollipopHeight
 
+	strokeColor := "#808080"
+
 	firstLollipop := true
 	for _, pop := range s.ticks {
 		if !pop.isLollipop {
@@ -81,8 +83,17 @@ func (s *diagram) svg(w io.Writer) {
 		}
 
 		fmt.Fprintf(w, `<line x1="%f" x2="%f" y1="%f" y2="%f" stroke="#BABDB6" stroke-width="2"/>`, pop.x, pop.x, pop.y, popbot)
-		fmt.Fprintf(w, `<a xlink:title="%s"><circle cx="%f" cy="%f" r="%f" fill="%s" /></a>`,
-			pop.label, pop.x, pop.y, pop.r, pop.Col)
+		if pop.Shape == 2 {
+			adjustWH := pop.r + (pop.r / 2)
+			adjustX := pop.x - (adjustWH / 2)
+			adjustY := pop.y - (adjustWH / 2)
+
+			fmt.Fprintf(w, `<a xlink:title="%s"><rect x="%f" y="%f" width="%f" height="%f" stroke="%s" fill="%s" stroke-width="2"/></a>`,
+				pop.label, adjustX, adjustY, adjustWH, adjustWH, strokeColor, pop.Col)
+		} else {
+			fmt.Fprintf(w, `<a xlink:title="%s"><circle cx="%f" cy="%f" r="%f" fill="%s" stroke="%s"/></a>`,
+				pop.label, pop.x, pop.y, pop.r, pop.Col, strokeColor)
+		}
 
 		if s.ShowLabels {
 			fmt.Fprintf(w, `<g transform="translate(%f,%f) rotate(-30)">`,
